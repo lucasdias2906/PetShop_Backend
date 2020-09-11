@@ -1,6 +1,8 @@
 import IUsersRepository from '@modules/users/repositories/IUserRepository';
 import { uuid } from 'uuidv4';
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
+import IFindAllProvidersDTO from '@modules/users/dtos/IFindAllProvidersDTO';
+
 import User from '../../infra/typeorm/entities/User';
 
 class FakeUsersRepository implements IUsersRepository {
@@ -17,6 +19,20 @@ class FakeUsersRepository implements IUsersRepository {
         const findUser = this.users.find(user => user.email === email);
 
         return findUser;
+    }
+
+    // listando todos os pretadores de servicos
+    public async findAllProviders({
+        expept_user_id,
+    }: IFindAllProvidersDTO): Promise<User[]> {
+        let { users } = this;
+
+        if (expept_user_id) {
+            // filtrando os usuarios, queremos apenas em que o ID for FIFERENTE expept_user_id, Entao iremos removelo
+            users = this.users.filter(user => user.id !== expept_user_id);
+        }
+
+        return users;
     }
 
     // criando um user e salvando

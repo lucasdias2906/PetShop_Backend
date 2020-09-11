@@ -1,6 +1,8 @@
-import { getRepository, Repository } from 'typeorm';
+import { getRepository, Repository, Not } from 'typeorm';
 import IUsersRepository from '@modules/users/repositories/IUserRepository';
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
+import IFindAllProvidersDTO from '@modules/users/dtos/IFindAllProvidersDTO';
+
 import User from '../entities/User';
 
 class UsersRepository implements IUsersRepository {
@@ -22,6 +24,25 @@ class UsersRepository implements IUsersRepository {
         const user = await this.ormRepository.findOne({ where: { email } });
 
         return user;
+    }
+
+    // filtrando os prestadores de servicos, que nem fizmos na repository de USER Porem de outra forma
+    public async findAllProviders({
+        expept_user_id,
+    }: IFindAllProvidersDTO): Promise<User[]> {
+        let users: User[];
+
+        if (expept_user_id) {
+            users = await this.ormRepository.find({
+                where: {
+                    id: Not(expept_user_id),
+                },
+            });
+        } else {
+            users = await this.ormRepository.find();
+        }
+
+        return users;
     }
 
     // criando um appointment e salvando
